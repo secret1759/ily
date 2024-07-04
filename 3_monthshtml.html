@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>To my Baby</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Global styles */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(180deg, rgba(255, 182, 193, 1) 0%, rgba(255, 228, 225, 1) 100%);
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .gradient-background {
+      background: linear-gradient(180deg, rgba(255, 182, 193, 1) 0%, rgba(255, 228, 225, 1) 100%);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .heart {
+      font-size: 3rem;
+      color: #ff69b4;
+    }
+
+    .image-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .image-container img {
+      width: 100px;
+      height: 100px;
+      margin: 0 10px;
+      border-radius: 8px;
+    }
+
+    /* Animated box styles */
+    .animated-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: red;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      font-size: 3rem;
+      display: none;
+      animation: growBox 5s forwards;
+      z-index: 1000;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    @keyframes growBox {
+      0% {
+        transform: translate(-50%, -50%) scale(0.1);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Canvas styles */
+    canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .text-container {
+      color: white; /* Text color set to white */
+    }
+  </style>
+</head>
+<body class="gradient-background">
+  <div class="text-center text-container" style="position: relative; z-index: 2;">
+    <div class="image-container">
+      <img src="us2.jpg" alt="Month 1">
+      <img src="us.jpg" alt="Month 2">
+      <img src="us3.jpg" alt="Month 3">
+    </div>
+    <h1 class="text-4xl font-bold mb-4">Happy 3 Months Baby</h1>
+    <p class="text-xl mb-2">I love you and you're worth every inch of the distance between us.</p>
+    <p class="heart">❤️</p>
+    <div class="mt-6">
+      <p class="text-2xl font-semibold">Our next hug in:</p>
+      <p id="countdown" class="text-3xl mt-2 font-bold"></p>
+    </div>
+    <p id="playAudioText" class="text-xl mt-4 text-blue-600 cursor-pointer underline">Click here to play our song</p>
+  </div>
+
+  
+
+  <!-- Canvas for fireworks -->
+  <canvas id="fireworks"></canvas>
+
+  <script>
+    // Countdown function
+    function updateCountdown() {
+      const targetDate = new Date("2024-09-16T00:00:00");
+      const now = new Date();
+      const difference = targetDate - now;
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      document.getElementById("countdown").textContent = 
+        `${days} days, ${hours} hours, ${minutes} minutes, ${seconds} seconds`;
+
+      if (difference < 0) {
+        document.getElementById("countdown").textContent = "The day is here!";
+      }
+    }
+
+    setInterval(updateCountdown, 1000);
+
+    let audioPlayed = false;
+
+    document.getElementById("playAudioText").addEventListener("click", function() {
+      if (!audioPlayed) {
+        const audio = document.createElement('audio');
+        audio.src = 'Akhiyaan Gulaab (Song)_ Shahid Kapoor, Kriti Sanon  Mitraz  Teri Baaton Mein Aisa Uljha Jiya.mp3#t=40,59';
+        audio.play();
+
+        // Show animated box
+        const animatedBox = document.getElementById('animatedBox');
+        animatedBox.style.display = 'block';
+
+        // Mark audio as played
+        audioPlayed = true;
+
+        // Shower of hearts effect
+        showerHearts();
+      }
+    });
+
+    function showerHearts() {
+      const heartCount = 100; // Number of hearts
+      const container = document.createElement('div');
+      container.classList.add('heart-container');
+      document.body.appendChild(container);
+
+      // Create hearts and animate them
+      for (let i = 0; i < heartCount; i++) {
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        container.appendChild(heart);
+
+        // Randomize heart position and animation duration
+        const x = Math.random() * window.innerWidth;
+        const y = Math.random() * window.innerHeight;
+        const size = Math.random() * 20 + 10;
+        const animationDuration = Math.random() * 3 + 2;
+
+        heart.style.left = `${x}px`;
+        heart.style.top = `${y}px`;
+        heart.style.width = `${size}px`;
+        heart.style.height = `${size}px`;
+        heart.style.animationDuration = `${animationDuration}s`;
+
+        // Remove heart after animation ends
+        heart.addEventListener('animationend', function() {
+          heart.remove();
+        });
+      }
+    }
+
+    // Fireworks simulation
+    const canvas = document.getElementById('fireworks');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.velocity = {
+          x: (Math.random() - 0.5) * 8,
+          y: (Math.random() - 0.5) * 8
+        };
+        this.alpha = 1;
+        this.friction = 0.99;
+      }
+
+      draw() {
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      update() {
+        this.velocity.x *= this.friction;
+        this.velocity.y *= this.friction;
+        this.x += this.velocity.x;
+        this.y += this.velocity.y;
+        this.alpha -= 0.01;
+      }
+    }
+
+    class Firework {
+      constructor(x, y, color) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        this.velocity = {x: 0, y: Math.random() * -2.5 - 0.5};
+        this.particles = [];
+        this.lifespan = 180;
+        this.hasExploded = false;
+      }
+
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 3, 0, Math.PI * 2, false);
+        ctx.fillStyle = this.color;
+        ctx.fill();
+      }
+
+      explode() {
+        for (let i = 0; i < 50; i++) {
+          this.particles.push(new Particle(this.x, this.y, this.color));
+        }
+      }
+
+      update() {
+        this.lifespan--;
+
+        if (this.lifespan <= 0 && !this.hasExploded) {
+          this.explode();
+          this.velocity = {x: 0, y: 0};
+          this.hasExploded = true;
+        } else if (this.lifespan > 0) {
+          this.y += this.velocity.y;
+        }
+
+        this.particles.forEach((particle, index) => {
+          particle.update();
+          particle.draw();
+
+          if (particle.alpha <= 0) {
+            this.particles.splice(index, 1);
+          }
+        });
+      }
+    }
+
+    let fireworks = [];
+
+    function animate() {
+      requestAnimationFrame(animate);
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      fireworks.forEach((firework, index) => {
+        firework.update();
+        firework.draw();
+
+        if (firework.lifespan <= 0 && firework.particles.every(p => p.alpha <= 0)) {
+          fireworks.splice(index, 1);
+        }
+      });
+
+      if (Math.random() < 0.015) { 
+        const x = Math.random() * canvas.width;
+        const color = `hsl(${Math.random() * 360}, 50%, 50%)`;
+        fireworks.push(new Firework(x, canvas.height, color));
+      }
+    }
+
+    animate();
+  </script>
+</body>
+</html>
